@@ -27,9 +27,11 @@ import argparse
 import logging
 import os
 
-from models import DiT_models
-from diffusion import create_diffusion
+from src.models import DiT_models
+from src.diffusion import create_diffusion
 from diffusers.models import AutoencoderKL
+
+from src.data_provider import data_provider
 
 
 #################################################################################
@@ -122,6 +124,10 @@ def main(args):
     torch.manual_seed(seed)
     torch.cuda.set_device(device)
     print(f"Starting rank={rank}, seed={seed}, world_size={dist.get_world_size()}.")
+
+    train_data, train_loader = data_provider(args, 'train')
+    valid_data, valid_loader = data_provider(args, 'valid')
+    test_data, test_loader = data_provider(args, 'test')
 
     # Setup an experiment folder:
     if rank == 0:
